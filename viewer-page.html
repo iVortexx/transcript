@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Transcript Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #2f3136;
+            color: white;
+        }
+        #loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2em;
+        }
+        #viewer {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #36393f;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        iframe {
+            width: 100%;
+            min-height: 800px;
+            border: none;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">Loading transcript...</div>
+    <div id="viewer"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Get the transcript URL from the query parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const transcriptUrl = urlParams.get('transcript');
+
+            if (!transcriptUrl) {
+                document.getElementById('loading').textContent = 'No transcript URL provided.';
+                return;
+            }
+
+            try {
+                // Fetch the transcript content
+                const response = await fetch(transcriptUrl);
+                const html = await response.text();
+
+                // Create iframe and set content
+                const iframe = document.createElement('iframe');
+                document.getElementById('viewer').appendChild(iframe);
+                
+                // Write the content to the iframe
+                iframe.contentDocument.open();
+                iframe.contentDocument.write(html);
+                iframe.contentDocument.close();
+
+                // Hide loading message
+                document.getElementById('loading').style.display = 'none';
+            } catch (error) {
+                document.getElementById('loading').textContent = 'Error loading transcript: ' + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
